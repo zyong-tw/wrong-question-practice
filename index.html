@@ -216,7 +216,20 @@
 
 <div class="header">
   <div class="logo">錯題練習 <span>/ 題庫</span></div>
-  <div id="header-count" style="font-size:13px; color:var(--text2);"></div>
+
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span id="user-name" style="font-size:13px;color:var(--text2);"></span>
+
+    <button id="login-btn" class="btn btn-sm">
+      Google登入
+    </button>
+
+    <button id="logout-btn" class="btn btn-sm" style="display:none;">
+      登出
+    </button>
+
+    <div id="header-count"></div>
+  </div>
 </div>
 
 <div class="tab-bar">
@@ -895,6 +908,79 @@ function resetStats() {
 renderOptFields();
 updateCatFilter();
 renderPractice();
+</script>
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA47TYGk5WIIjk50N2ukr2luXgNk70USnM",
+  authDomain: "wrong-question-practice-28eaa.firebaseapp.com",
+  projectId: "wrong-question-practice-28eaa",
+  storageBucket: "wrong-question-practice-28eaa.firebasestorage.app",
+  messagingSenderId: "217099056862",
+  appId: "1:217099056862:web:154e7745fb8dec40bd744f",
+  measurementId: "G-YDS954TGZM"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const userName = document.getElementById("user-name");
+
+loginBtn.addEventListener("click", async () => {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch(err) {
+    console.error(err);
+    alert("登入失敗");
+  }
+});
+
+logoutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+});
+
+onAuthStateChanged(auth, (user) => {
+
+  if(user){
+
+    window.currentUser = user;
+
+    userName.textContent =
+      user.displayName || user.email;
+
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-flex";
+
+  }else{
+
+    window.currentUser = null;
+
+    userName.textContent = "";
+
+    loginBtn.style.display = "inline-flex";
+    logoutBtn.style.display = "none";
+
+  }
+
+});
+
 </script>
 </body>
 </html>
