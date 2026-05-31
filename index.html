@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>錯題練習</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.2);
+    --text: #1a1a18;
+    --text2: #666660;
+    --text3: #999994;
+    --accent: #2a2a28;
+    --correct-bg: #eaf3de;
+    --correct-border: #639922;
+    --correct-text: #27500a;
+    --wrong-bg: #fcebeb;
+    --wrong-border: #e24b4a;
+    --wrong-text: #791f1f;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18;
+      --surface: #242422;
+      --surface2: #2e2e2b;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.2);
+      --text: #f0ede6;
+      --text2: #999994;
+      --text3: #666660;
+      --accent: #f0ede6;
+      --correct-bg: #173404;
+      --correct-border: #639922;
+      --correct-text: #c0dd97;
+      --wrong-bg: #501313;
+      --wrong-border: #e24b4a;
+      --wrong-text: #f09595;
+    }
+  }
+  body {
+    font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .logo { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+  .logo span { color: var(--text2); font-weight: 400; }
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    font-family: inherit;
+  }
+  .tab.active { color: var(--text); border-bottom-color: var(--text); }
+  .tab:hover:not(.active) { color: var(--text); }
+  .container { max-width: 700px; margin: 0 auto; padding: 1.5rem; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input[type="text"]:focus, textarea:focus {
+    border-color: var(--text2);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 5px; display: block; }
+  .option-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .option-lbl { font-size: 13px; font-weight: 600; color: var(--text2); width: 22px; flex-shrink: 0; }
+  .option-row input[type="text"] { flex: 1; }
+  .radio-wrap { position: relative; flex-shrink: 0; }
+  .radio-wrap input[type="radio"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
+  .radio-wrap .tooltip { position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); font-size: 11px; padding: 3px 7px; border-radius: 5px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+  .radio-wrap:hover .tooltip { opacity: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: transparent;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text);
+    font-family: inherit;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn-primary:hover { opacity: 0.88; background: var(--text); }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .btn-danger { border-color: var(--wrong-border); color: var(--wrong-text); }
+  .btn-danger:hover { background: var(--wrong-bg); }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .stat-lbl { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .mode-bar { display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .mode-btn {
+    padding: 6px 14px; border-radius: 999px;
+    border: 1px solid var(--border2);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; background: transparent;
+    color: var(--text2); transition: all 0.15s;
+    font-family: inherit;
+  }
+  .mode-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .mode-btn:hover:not(.active) { color: var(--text); border-color: var(--text2); }
+  .progress-bar { height: 3px; background: var(--surface2); border-radius: 2px; margin-bottom: 1rem; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--text); border-radius: 2px; transition: width 0.3s ease; }
+  .prog-label { font-size: 13px; color: var(--text3); margin-bottom: 1rem; }
+  .question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; }
+  .cat-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 999px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); margin-bottom: 12px; }
+  .q-text { font-size: 16px; font-weight: 500; line-height: 1.65; margin-bottom: 1.25rem; }
+  .option-btn {
+    display: flex; align-items: flex-start; gap: 10px;
+    width: 100%; text-align: left;
+    padding: 11px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: transparent;
+    font-size: 14px; color: var(--text);
+    cursor: pointer; margin-bottom: 8px;
+    transition: all 0.15s;
+    font-family: inherit; line-height: 1.5;
+  }
+  .option-btn:hover:not(:disabled) { background: var(--surface2); border-color: var(--border2); }
+  .option-btn .opt-key { font-weight: 600; color: var(--text2); flex-shrink: 0; min-width: 20px; }
+  .option-btn.correct { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-text); }
+  .option-btn.correct .opt-key { color: var(--correct-text); }
+  .option-btn.wrong { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-text); }
+  .option-btn.wrong .opt-key { color: var(--wrong-text); }
+  .option-btn:disabled { cursor: default; }
+  .result-msg { font-size: 14px; font-weight: 500; padding: 12px 14px; border-radius: var(--radius); margin-top: 12px; }
+  .result-msg.correct { background: var(--correct-bg); color: var(--correct-text); border: 1px solid var(--correct-border); }
+  .result-msg.wrong { background: var(--wrong-bg); color: var(--wrong-text); border: 1px solid var(--wrong-border); }
+  .explain-box { font-size: 13px; color: var(--text2); margin-top: 10px; padding: 10px 14px; background: var(--surface2); border-radius: var(--radius); line-height: 1.6; }
+  .next-btn-wrap { margin-top: 14px; }
+  .finish-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; text-align: center; }
+  .finish-score { font-size: 64px; font-weight: 800; letter-spacing: -0.04em; color: var(--text); line-height: 1; }
+  .finish-label { font-size: 15px; color: var(--text2); margin-top: 8px; margin-bottom: 1.5rem; }
+  .finish-detail { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; font-size: 14px; color: var(--text2); }
+  .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text2); font-size: 15px; line-height: 2; }
+  .bank-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+  .bank-content { flex: 1; }
+  .bank-q { font-size: 14px; color: var(--text); margin-bottom: 4px; line-height: 1.5; }
+  .bank-meta { font-size: 12px; color: var(--text2); }
+  .bank-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+  .import-area { background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .import-hint { font-size: 12px; color: var(--text3); margin-top: 8px; line-height: 1.6; font-family: monospace; }
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--surface2); color: var(--text3); margin-right: 4px; }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; flex-wrap: wrap; }
+  select { width: auto; display: inline-block; padding: 6px 10px; font-size: 13px; }
+  .option-btn.selected { background: var(--surface2); border-color: var(--text2); }
+  #msg-add, #msg-import { font-size: 13px; margin-top: 8px; }
+  /* Modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:flex-start; justify-content:center; padding:2rem 1rem; overflow-y:auto; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--surface); border-radius:var(--radius-lg); border:1px solid var(--border); width:100%; max-width:580px; padding:1.5rem; }
+  .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+  .modal-title { font-size:16px; font-weight:600; color:var(--text); }
+  .modal-close { background:none; border:none; font-size:20px; color:var(--text2); cursor:pointer; padding:4px 8px; border-radius:var(--radius); line-height:1; }
+  .modal-close:hover { background:var(--surface2); color:var(--text); }
+  #msg-edit { font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">錯題練習 <span>/ 題庫</span></div>
+  <div id="header-count" style="font-size:13px; color:var(--text2);"></div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab('practice')">📝 練習</button>
+  <button class="tab" onclick="switchTab('add')">➕ 新增題目</button>
+  <button class="tab" onclick="switchTab('bank')">📚 題庫管理</button>
+  <button class="tab" onclick="switchTab('import')">📥 批次匯入</button>
+</div>
+
+<div class="container">
+
+  <!-- PRACTICE -->
+  <div class="panel active" id="panel-practice">
+    <div class="stats-row" id="stats-row"></div>
+    <div class="mode-bar">
+      <button class="mode-btn active" id="mode-all" onclick="setMode('all')">全部題目</button>
+      <button class="mode-btn" id="mode-wrong" onclick="setMode('wrong')">錯題優先</button>
+      <button class="mode-btn" id="mode-random" onclick="setMode('random')">隨機順序</button>
+    </div>
+    <div class="filter-row">
+      <label style="font-size:13px; color:var(--text2);">分類篩選：</label>
+      <select id="cat-filter" onchange="applyFilter()" style="min-width:120px;">
+        <option value="">全部分類</option>
+      </select>
+    </div>
+    <div id="practice-area"></div>
+  </div>
+
+  <!-- ADD -->
+  <div class="panel" id="panel-add">
+    <div class="form-group">
+      <label class="form-label">題目分類（選填）</label>
+      <input type="text" id="inp-cat" placeholder="輸入新分類或從下拉選擇" list="cat-datalist" autocomplete="off">
+      <datalist id="cat-datalist"></datalist>
+    </div>
+    <div class="form-group">
+      <label class="form-label">題目內容 *</label>
+      <textarea id="inp-q" placeholder="輸入題目..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">選項（2–6 個，勾選方塊標記正確答案，可複選）</label>
+      <div id="options-container"></div>
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button class="btn btn-sm" onclick="addOpt()">+ 增加選項</button>
+        <button class="btn btn-sm" onclick="removeOpt()">− 減少選項</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">解析說明（選填）</label>
+      <textarea id="inp-explain" placeholder="輸入解題說明..."></textarea>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:1rem;">
+      <button class="btn btn-primary" onclick="saveQ()">儲存題目</button>
+      <button class="btn" onclick="clearForm()">清除表單</button>
+    </div>
+    <div id="msg-add"></div>
+  </div>
+
+  <!-- BANK -->
+  <div class="panel" id="panel-bank">
+    <div class="bank-header">
+      <div>
+        <span id="bank-count" style="font-size:14px; color:var(--text2);">共 0 題</span>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-sm" onclick="exportJSON()">匯出備份</button>
+        <button class="btn btn-sm btn-danger" onclick="clearAll()">清空題庫</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <label style="font-size:13px; color:var(--text2);">篩選：</label>
+      <select id="bank-filter" onchange="renderBank()"></select>
+    </div>
+    <div id="bank-list"></div>
+  </div>
+
+  <!-- IMPORT -->
+  <div class="panel" id="panel-import">
+    <div class="section-title">JSON 格式批次匯入</div>
+    <div class="import-area">
+      <textarea id="import-json" rows="12" placeholder='[
+  {
+    "category": "數學",
+    "question": "3 × 4 = ?",
+    "options": ["10", "11", "12", "13"],
+    "answer": 2,
+    "explanation": "3乘以4等於12"
+  },
+  {
+    "category": "英文",
+    "question": "Apple 的中文是？",
+    "options": ["橘子", "蘋果", "香蕉"],
+    "answer": 1
+  }
+]' style="font-family:monospace; font-size:13px;"></textarea>
+      <div class="import-hint">
+        格式說明：<br>
+        • answer = 正確選項的索引（從 0 開始，A=0, B=1, C=2...）<br>
+        • 多選題：answer 用陣列，例如 "answer": [0, 2]<br>
+        • category、explanation 為選填欄位
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="importJSON()">開始匯入</button>
+    <div id="msg-import"></div>
+    <hr class="divider">
+    <div class="section-title">匯出 / 備份</div>
+    <p style="font-size:13px; color:var(--text2); margin-bottom:10px;">將題庫匯出為 JSON 檔，可備份或轉移到其他裝置使用。</p>
+    <button class="btn" onclick="exportJSON()">📤 下載 JSON 備份</button>
+    <hr class="divider">
+    <div class="section-title">重置統計</div>
+    <p style="font-size:13px; color:var(--text2); margin-bottom:10px;">清除所有題目的答題紀錄（錯誤/正確次數），保留題目內容。</p>
+    <button class="btn btn-sm btn-danger" onclick="resetStats()">重置所有統計</button>
+  </div>
+
+</div><!-- /container -->
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal" onclick="closeEditModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">修改題目</span>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">題目分類（選填）</label>
+      <input type="text" id="edit-cat" placeholder="輸入新分類或從下拉選擇" list="edit-cat-datalist" autocomplete="off">
+      <datalist id="edit-cat-datalist"></datalist>
+    </div>
+    <div class="form-group">
+      <label class="form-label">題目內容 *</label>
+      <textarea id="edit-q" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">選項（勾選方塊標記正確答案，可複選）</label>
+      <div id="edit-options-container"></div>
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button class="btn btn-sm" onclick="editAddOpt()">+ 增加選項</button>
+        <button class="btn btn-sm" onclick="editRemoveOpt()">− 減少選項</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">解析說明（選填）</label>
+      <textarea id="edit-explain" rows="2"></textarea>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:1rem;">
+      <button class="btn btn-primary" onclick="saveEdit()">儲存修改</button>
+      <button class="btn" onclick="closeEditModal()">取消</button>
+    </div>
+    <div id="msg-edit"></div>
+  </div>
+</div>
+
+<script>
+let db = [];
+let session = { queue: [], current: 0, correct: 0, answered: 0, mode: 'all', catFilter: '' };
+let optCount = 4;
+
+function loadDB() {
+  try { db = JSON.parse(localStorage.getItem('wrongq_v2') || '[]'); }
+  catch(e) { db = []; }
+}
+function saveDB() {
+  try { localStorage.setItem('wrongq_v2', JSON.stringify(db)); }
+  catch(e) { alert('儲存失敗，可能是瀏覽器儲存空間不足'); }
+}
+
+loadDB();
+
+/* ===================== UTILITY ===================== */
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = type === 'ok' ? 'var(--correct-text)' : type === 'err' ? 'var(--wrong-text)' : 'var(--text2)';
+}
+function getCategories() {
+  const cats = new Set();
+  db.forEach(q => { if (q.category) cats.add(q.category); });
+  return [...cats].sort();
+}
+
+/* ===================== TAB ===================== */
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['practice','add','bank','import'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'practice') { updateCatFilter(); renderPractice(); }
+  if (name === 'add') { renderOptFields(); document.getElementById('msg-add').textContent = ''; updateCatDatalist(); }
+  if (name === 'bank') { renderBank(); }
+  updateHeaderCount();
+}
+
+function updateHeaderCount() {
+  document.getElementById('header-count').textContent = `共 ${db.length} 題`;
+}
+
+function updateCatDatalist() {
+  const cats = getCategories();
+  ['cat-datalist', 'edit-cat-datalist'].forEach(id => {
+    const dl = document.getElementById(id);
+    if (!dl) return;
+    dl.innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+  });
+}
+
+/* ===================== PRACTICE ===================== */
+function updateCatFilter() {
+  const sel = document.getElementById('cat-filter');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">全部分類</option>';
+  getCategories().forEach(c => {
+    sel.innerHTML += `<option value="${esc(c)}"${prev===c?' selected':''}>${esc(c)}</option>`;
+  });
+}
+
+function applyFilter() {
+  session.catFilter = document.getElementById('cat-filter').value;
+  startSession();
+}
+
+function setMode(m) {
+  session.mode = m;
+  ['all','wrong','random'].forEach(x => {
+    document.getElementById('mode-' + x).classList.toggle('active', x === m);
+  });
+  startSession();
+}
+
+function getPool() {
+  let pool = db.filter(q => !session.catFilter || q.category === session.catFilter);
+  if (session.mode === 'wrong') pool = [...pool].sort((a,b) => b.wrongCount - a.wrongCount);
+  else if (session.mode === 'random') pool = [...pool].sort(() => Math.random() - 0.5);
+  return pool;
+}
+
+function startSession() {
+  const pool = getPool();
+  session.queue = pool.map(q => q.id);
+  session.current = 0;
+  session.correct = 0;
+  session.answered = 0;
+  renderPractice();
+}
+
+function renderStats() {
+  const total = db.length;
+  const tw = db.reduce((s,q) => s + q.wrongCount, 0);
+  const tc = db.reduce((s,q) => s + q.correctCount, 0);
+  const acc = (tw+tc) > 0 ? Math.round(tc/(tw+tc)*100) : 0;
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${total}</div><div class="stat-lbl">題目總數</div></div>
+    <div class="stat-card"><div class="stat-val">${tw}</div><div class="stat-lbl">累計錯誤</div></div>
+    <div class="stat-card"><div class="stat-val">${acc}%</div><div class="stat-lbl">歷史正確率</div></div>`;
+}
+
+function renderPractice() {
+  renderStats();
+  updateHeaderCount();
+  if (db.length === 0) {
+    document.getElementById('practice-area').innerHTML = `<div class="empty-state">📭 題庫是空的<br>到「新增題目」或「批次匯入」加入題目吧！</div>`;
+    return;
+  }
+  if (session.queue.length === 0) startSession();
+  if (session.current >= session.queue.length) { showFinish(); return; }
+
+  const qid = session.queue[session.current];
+  const q = db.find(x => x.id === qid);
+  if (!q) { session.current++; renderPractice(); return; }
+
+  const labels = ['A','B','C','D','E','F'];
+  const prog = Math.round(session.current / session.queue.length * 100);
+  const isMulti = Array.isArray(q.answer);
+
+  let html = `<div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div>
+    <div class="prog-label">${session.current+1} / ${session.queue.length}</div>
+    <div class="question-card">
+      ${q.category ? `<div><span class="cat-badge">${esc(q.category)}</span></div>` : ''}
+      ${isMulti ? `<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">📋 複選題，請選出所有正確答案</div>` : ''}
+      <div class="q-text">${esc(q.question)}</div>
+      <div id="opts">`;
+  q.options.forEach((opt, i) => {
+    html += `<button class="option-btn" onclick="answer(${i})"><span class="opt-key">${labels[i]}.</span><span>${esc(opt)}</span></button>`;
+  });
+  html += `</div>`;
+  if (isMulti) {
+    html += `<div style="margin-top:10px;"><button id="submit-multi-btn" class="btn btn-primary" onclick="submitMulti()">確認作答</button></div>`;
+  }
+  html += `<div id="result-area"></div></div>`;
+  document.getElementById('practice-area').innerHTML = html;
+}
+
+function answer(idx) {
+  const qid = session.queue[session.current];
+  const q = db.find(x => x.id === qid);
+  if (!q) return;
+  const labels = ['A','B','C','D','E','F'];
+  const isMulti = Array.isArray(q.answer);
+
+  if (!isMulti) {
+    // single answer — immediate feedback on click
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach(b => b.disabled = true);
+    const ok = idx === q.answer;
+    btns[idx].classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) btns[q.answer].classList.add('correct');
+    if (ok) { q.correctCount++; session.correct++; }
+    else q.wrongCount++;
+    session.answered++;
+    saveDB();
+    let html = `<div class="result-msg ${ok?'correct':'wrong'}">${ok ? '✓ 答對了！' : `✗ 答錯了，正確答案是 ${labels[q.answer]}. ${esc(q.options[q.answer])}`}</div>`;
+    if (q.explanation) html += `<div class="explain-box">📝 ${esc(q.explanation)}</div>`;
+    html += `<div class="next-btn-wrap"><button class="btn btn-primary" onclick="nextQ()">下一題 →</button></div>`;
+    document.getElementById('result-area').innerHTML = html;
+  } else {
+    // multi answer — toggle selection highlight
+    const btn = document.querySelectorAll('.option-btn')[idx];
+    btn.classList.toggle('selected');
+  }
+}
+
+function submitMulti() {
+  const qid = session.queue[session.current];
+  const q = db.find(x => x.id === qid);
+  if (!q) return;
+  const labels = ['A','B','C','D','E','F'];
+  const correctSet = new Set(q.answer);
+  const btns = document.querySelectorAll('.option-btn');
+  const selected = new Set();
+  btns.forEach((b, i) => { if (b.classList.contains('selected')) selected.add(i); });
+  btns.forEach(b => b.disabled = true);
+
+  const ok = selected.size === correctSet.size && [...selected].every(i => correctSet.has(i));
+  btns.forEach((b, i) => {
+    if (correctSet.has(i)) b.classList.add('correct');
+    else if (selected.has(i)) b.classList.add('wrong');
+    b.classList.remove('selected');
+  });
+
+  if (ok) { q.correctCount++; session.correct++; }
+  else q.wrongCount++;
+  session.answered++;
+  saveDB();
+
+  const correctLabels = q.answer.map(i => labels[i] + '. ' + esc(q.options[i])).join('、');
+  let html = `<div class="result-msg ${ok?'correct':'wrong'}">${ok ? '✓ 完全答對！' : `✗ 答錯了，正確答案是 ${correctLabels}`}</div>`;
+  if (q.explanation) html += `<div class="explain-box">📝 ${esc(q.explanation)}</div>`;
+  html += `<div class="next-btn-wrap"><button class="btn btn-primary" onclick="nextQ()">下一題 →</button></div>`;
+  document.getElementById('result-area').innerHTML = html;
+  document.getElementById('submit-multi-btn') && (document.getElementById('submit-multi-btn').style.display = 'none');
+}
+
+function nextQ() {
+  session.current++;
+  renderPractice();
+}
+
+function showFinish() {
+  const pct = session.answered > 0 ? Math.round(session.correct / session.answered * 100) : 0;
+  document.getElementById('practice-area').innerHTML = `
+    <div class="finish-card">
+      <div class="finish-score">${pct}<span style="font-size:28px;">%</span></div>
+      <div class="finish-label">本輪練習完成</div>
+      <div class="finish-detail">
+        <span>答對 ${session.correct} 題</span>
+        <span>答錯 ${session.answered - session.correct} 題</span>
+        <span>共 ${session.answered} 題</span>
+      </div>
+      <button class="btn btn-primary" onclick="startSession()">再練一次</button>
+    </div>`;
+}
+
+/* ===================== ADD QUESTION ===================== */
+// correctIdxSet stores a Set of checked indices for multi-answer
+let correctIdxSet = new Set([0]);
+
+function renderOptFields(savedValues) {
+  const c = document.getElementById('options-container');
+  c.innerHTML = '';
+  const labels = ['A','B','C','D','E','F'];
+  for (let i = 0; i < optCount; i++) {
+    const row = document.createElement('div');
+    row.className = 'option-row';
+    const val = savedValues && savedValues[i] !== undefined ? savedValues[i] : '';
+    const checked = correctIdxSet.has(i) ? 'checked' : '';
+    row.innerHTML = `<span class="option-lbl">${labels[i]}.</span>
+      <input type="text" id="opt-${i}" placeholder="選項 ${labels[i]}" value="${esc(val)}">
+      <div class="radio-wrap">
+        <input type="checkbox" value="${i}" ${checked} onchange="toggleCorrect(${i}, this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent);">
+        <span class="tooltip">標記為正確答案</span>
+      </div>`;
+    c.appendChild(row);
+  }
+}
+
+function toggleCorrect(idx, checked) {
+  if (checked) correctIdxSet.add(idx);
+  else correctIdxSet.delete(idx);
+}
+
+function saveCurrentOptValues() {
+  const saved = [];
+  for (let i = 0; i < optCount; i++) {
+    const el = document.getElementById('opt-' + i);
+    saved[i] = el ? el.value : '';
+  }
+  return saved;
+}
+
+function addOpt() {
+  if (optCount >= 6) return;
+  const saved = saveCurrentOptValues();
+  optCount++;
+  renderOptFields(saved);
+  document.getElementById('opt-' + (optCount-1)).focus();
+}
+
+function removeOpt() {
+  if (optCount <= 2) return;
+  const saved = saveCurrentOptValues();
+  correctIdxSet.delete(optCount - 1);
+  optCount--;
+  renderOptFields(saved);
+}
+
+function saveQ() {
+  const q = (document.getElementById('inp-q').value||'').trim();
+  if (!q) { showMsg('msg-add','請填入題目內容','err'); return; }
+  const opts = [];
+  const idxMap = [];
+  for (let i = 0; i < optCount; i++) {
+    const v = ((document.getElementById('opt-'+i)||{}).value||'').trim();
+    if (v) { idxMap.push(i); opts.push(v); }
+  }
+  if (opts.length < 2) { showMsg('msg-add','至少需要 2 個選項','err'); return; }
+  const ansSet = [...correctIdxSet].filter(i => idxMap.includes(i));
+  if (ansSet.length === 0) { showMsg('msg-add','請勾選至少一個正確答案','err'); return; }
+  // remap indices after filtering empty opts
+  const ans = ansSet.map(i => idxMap.indexOf(i)).filter(i => i >= 0);
+  const isSingle = ans.length === 1;
+  db.push({
+    id: Date.now() + Math.random(),
+    category: (document.getElementById('inp-cat').value||'').trim(),
+    question: q,
+    options: opts,
+    answer: isSingle ? ans[0] : ans,   // single = number, multi = array
+    explanation: (document.getElementById('inp-explain').value||'').trim(),
+    wrongCount: 0,
+    correctCount: 0,
+    createdAt: Date.now()
+  });
+  saveDB();
+  showMsg('msg-add','✓ 題目已儲存！','ok');
+  clearForm();
+}
+
+function clearForm() {
+  ['inp-q','inp-cat','inp-explain'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  optCount = 4; correctIdxSet = new Set([0]);
+  renderOptFields([]);
+}
+
+/* ===================== BANK ===================== */
+function renderBank() {
+  updateHeaderCount();
+  const sel = document.getElementById('bank-filter');
+  const prev = sel ? sel.value : '';
+  if (sel) {
+    sel.innerHTML = '<option value="">全部分類</option>';
+    getCategories().forEach(c => {
+      sel.innerHTML += `<option value="${esc(c)}"${prev===c?' selected':''}>${esc(c)}</option>`;
+    });
+  }
+  const filter = sel ? sel.value : '';
+  const list = db.filter(q => !filter || q.category === filter);
+  document.getElementById('bank-count').textContent = `共 ${db.length} 題${filter?' (篩選顯示 '+list.length+' 題)':''}`;
+
+  const labels = ['A','B','C','D','E','F'];
+  const bankEl = document.getElementById('bank-list');
+  if (list.length === 0) {
+    bankEl.innerHTML = '<div class="empty-state">📭 沒有符合的題目</div>';
+    return;
+  }
+  bankEl.innerHTML = list.map(q => `
+    <div class="bank-item">
+      <div class="bank-content">
+        ${q.category ? `<span class="tag">${esc(q.category)}</span>` : ''}
+        <div class="bank-q">${esc(q.question)}</div>
+        <div class="bank-meta">正確：${
+          Array.isArray(q.answer)
+            ? q.answer.map(i => labels[i] + '. ' + esc(q.options[i])).join('、')
+            : labels[q.answer] + '. ' + esc(q.options[q.answer])
+        } ｜ 錯 ${q.wrongCount} 次 / 對 ${q.correctCount} 次</div>
+      </div>
+      <div style="display:flex; gap:6px; flex-shrink:0;">
+        <button class="btn btn-sm" onclick="openEditModal(${JSON.stringify(q.id)})">修改</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteQ(${JSON.stringify(q.id)})">刪除</button>
+      </div>
+    </div>`).join('');
+}
+
+function deleteQ(id) {
+  if (!confirm('確定刪除這道題目？')) return;
+  db = db.filter(q => q.id !== id);
+  saveDB(); renderBank();
+}
+
+function clearAll() {
+  if (!confirm('確定要清空整個題庫嗎？此操作無法復原！')) return;
+  db = []; saveDB(); renderBank(); renderStats(); updateHeaderCount();
+}
+
+/* ===================== EDIT MODAL ===================== */
+let editId = null;
+let editOptCount = 4;
+let editCorrectSet = new Set([0]);
+
+function openEditModal(id) {
+  const q = db.find(x => x.id === id);
+  if (!q) return;
+  editId = id;
+  editOptCount = q.options.length;
+  editCorrectSet = new Set(Array.isArray(q.answer) ? q.answer : [q.answer]);
+  document.getElementById('edit-cat').value = q.category || '';
+  document.getElementById('edit-q').value = q.question || '';
+  document.getElementById('edit-explain').value = q.explanation || '';
+  document.getElementById('msg-edit').textContent = '';
+  renderEditOptFields(q.options);
+  updateCatDatalist();
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal(e) {
+  if (e && e.target !== document.getElementById('edit-modal')) return;
+  document.getElementById('edit-modal').classList.remove('open');
+  editId = null;
+}
+
+function renderEditOptFields(savedValues) {
+  const c = document.getElementById('edit-options-container');
+  c.innerHTML = '';
+  const labels = ['A','B','C','D','E','F'];
+  for (let i = 0; i < editOptCount; i++) {
+    const row = document.createElement('div');
+    row.className = 'option-row';
+    const val = savedValues && savedValues[i] !== undefined ? savedValues[i] : '';
+    const checked = editCorrectSet.has(i) ? 'checked' : '';
+    row.innerHTML = `<span class="option-lbl">${labels[i]}.</span>
+      <input type="text" id="edit-opt-${i}" placeholder="選項 ${labels[i]}" value="${esc(val)}">
+      <div class="radio-wrap">
+        <input type="checkbox" value="${i}" ${checked} onchange="toggleEditCorrect(${i}, this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent);">
+        <span class="tooltip">標記為正確答案</span>
+      </div>`;
+    c.appendChild(row);
+  }
+}
+
+function toggleEditCorrect(idx, checked) {
+  if (checked) editCorrectSet.add(idx);
+  else editCorrectSet.delete(idx);
+}
+
+function saveEditOptValues() {
+  const saved = [];
+  for (let i = 0; i < editOptCount; i++) {
+    const el = document.getElementById('edit-opt-' + i);
+    saved[i] = el ? el.value : '';
+  }
+  return saved;
+}
+
+function editAddOpt() {
+  if (editOptCount >= 6) return;
+  const saved = saveEditOptValues();
+  editOptCount++;
+  renderEditOptFields(saved);
+  document.getElementById('edit-opt-' + (editOptCount-1)).focus();
+}
+
+function editRemoveOpt() {
+  if (editOptCount <= 2) return;
+  const saved = saveEditOptValues();
+  editCorrectSet.delete(editOptCount - 1);
+  editOptCount--;
+  renderEditOptFields(saved);
+}
+
+function saveEdit() {
+  const q = db.find(x => x.id === editId);
+  if (!q) return;
+  const qText = (document.getElementById('edit-q').value||'').trim();
+  if (!qText) { showMsg('msg-edit','請填入題目內容','err'); return; }
+  const opts = [];
+  const idxMap = [];
+  for (let i = 0; i < editOptCount; i++) {
+    const v = ((document.getElementById('edit-opt-'+i)||{}).value||'').trim();
+    if (v) { idxMap.push(i); opts.push(v); }
+  }
+  if (opts.length < 2) { showMsg('msg-edit','至少需要 2 個選項','err'); return; }
+  const ansSet = [...editCorrectSet].filter(i => idxMap.includes(i));
+  if (ansSet.length === 0) { showMsg('msg-edit','請勾選至少一個正確答案','err'); return; }
+  const ans = ansSet.map(i => idxMap.indexOf(i)).filter(i => i >= 0);
+  q.category = (document.getElementById('edit-cat').value||'').trim();
+  q.question = qText;
+  q.options = opts;
+  q.answer = ans.length === 1 ? ans[0] : ans;
+  q.explanation = (document.getElementById('edit-explain').value||'').trim();
+  saveDB();
+  showMsg('msg-edit','✓ 已儲存','ok');
+  setTimeout(() => {
+    document.getElementById('edit-modal').classList.remove('open');
+    editId = null;
+    renderBank();
+  }, 600);
+}
+
+
+function importJSON() {
+  const raw = (document.getElementById('import-json').value||'').trim();
+  try {
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) throw new Error('非陣列格式');
+    let count = 0;
+    arr.forEach(item => {
+      if (!item.question || !Array.isArray(item.options) || item.options.length < 2 || item.answer === undefined) return;
+      db.push({
+        id: Date.now() + Math.random(),
+        category: item.category || '',
+        question: item.question,
+        options: item.options,
+        answer: parseInt(item.answer),
+        explanation: item.explanation || '',
+        wrongCount: 0, correctCount: 0,
+        createdAt: Date.now()
+      });
+      count++;
+    });
+    saveDB();
+    showMsg('msg-import', `✓ 成功匯入 ${count} 題`, 'ok');
+  } catch(e) {
+    showMsg('msg-import', '✗ JSON 格式錯誤：' + e.message, 'err');
+  }
+}
+
+function exportJSON() {
+  const data = JSON.stringify(
+    db.map(({category,question,options,answer,explanation}) => ({category,question,options,answer,explanation})),
+    null, 2
+  );
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `錯題題庫_${new Date().toLocaleDateString('zh-TW').replace(/\//g,'-')}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function resetStats() {
+  if (!confirm('確定要重置所有題目的答題統計嗎？')) return;
+  db.forEach(q => { q.wrongCount = 0; q.correctCount = 0; });
+  saveDB();
+  alert('統計已重置');
+}
+
+/* ===================== INIT ===================== */
+renderOptFields();
+updateCatFilter();
+renderPractice();
+</script>
+</body>
+</html>
